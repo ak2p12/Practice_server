@@ -1,76 +1,36 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ServerCore
 {
-    class SpinLock
-    {
-
-        volatile int  locked = 0;
-
-        public void Acquire()
-        {
-            while(true)
-            {
-                //int original = Interlocked.Exchange(ref locked, 1);
-
-                //if (original == 0)
-                //{
-                //    break;
-                //}
-
-                int original = Interlocked.CompareExchange(ref locked , 1 , 0);
-
-                if (original == 0)
-                {
-                    break;
-                }
-                    
-            }
-        }
-
-        public void Release()
-        {
-            locked = 0;
-        }
-    }
     class Program
     {
-        static int number = 0;
-        static SpinLock spinlock = new SpinLock();
-
-        static void Thread_1()
-        {
-            for(int i = 0; i < 100000; ++i)
-            {
-                spinlock.Acquire();
-                number++;
-                spinlock.Release();
-            }
-        }
-
-        static void Thread_2()
-        {
-            for(int i = 0; i < 100000; ++i)
-            {
-                spinlock.Acquire();
-                number--;
-                spinlock.Release();
-            }
-        }
         static void Main(string[] args)
         {
-            Task t1 = new Task(Thread_1);
-            Task t2 = new Task(Thread_2);
+            //DSN (Domain Name System)
+            string host = Dns.GetHostName(); //로컬pc의 호스트 이름을 얻는다
+            IPHostEntry ipHost = Dns.GetHostEntry(host); //호스트 정보를 얻는다.
+            IPAddress ipAddr = ipHost.AddressList[0];
+            IPEndPoint endPoint = new IPEndPoint(ipAddr , 7777);
 
-            t1.Start();
-            t2.Start();
+            Socket listenSocket = new Socket(endPoint.AddressFamily,SocketType.Stream, ProtocolType.Tcp);
 
-            Task.WaitAll(t1,t2);
+            listenSocket.Bind(endPoint);
 
-            Console.WriteLine(number);
+            listenSocket.Listen(10); //최대 대기수
 
+            while(true)
+            {
+                Console.WriteLine("서버개방");
+
+                Socket clientSocket = listenSocket.Accept();
+
+                byte[] recvBuff = new byte[1024];
+                clientSocket.Receive();
+            }
         }
     }
 }
