@@ -26,10 +26,14 @@ namespace DummyClient
                     //문지기에게 입장 문의
                     socket.Connect(endPoint);
                     Console.WriteLine($"연결완료 : {socket.RemoteEndPoint.ToString()}");
-
-                    //보낸다
-                    byte[] sendBuff = Encoding.UTF8.GetBytes("안녕하세요 클라입니다");
-                    int sendbytes = socket.Send(sendBuff);
+                    
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        //보낸다
+                        byte[] sendBuff = Encoding.UTF8.GetBytes($"안녕하세요 클라입니다  {i}");
+                        int sendbytes = socket.Send(sendBuff);
+                    }
+                    
 
                     //받는다
                     byte[] recvBuff = new byte[1024];
@@ -46,7 +50,7 @@ namespace DummyClient
                     Console.WriteLine(e.ToString());
                 }
 
-                Thread.Sleep(10000);
+                Thread.Sleep(100);
             }
 
             
