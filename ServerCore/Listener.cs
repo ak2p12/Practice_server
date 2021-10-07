@@ -13,17 +13,18 @@ namespace ServerCore
         //클라에서 서버에 접속 요청을 하면 서버 소켓에서 판단하여 승인 여부 결정
         //반대로 서버에서 클라이언트에 접속요청을 하면 클라이언트소켓에서 판단하여 승연 여부 결정
         //창구 또는 문지기 역할
-        Socket listenSocket;
-        Action<Socket> onAcceptHandler;
+        Socket listenSocket; //서버의 소켓
+        Func<Session> sessionFactory; //서버 컨텐츠(서버기능) 생성기
 
-        public void Init(IPEndPoint _endPoint , Action<Socket> _acceptHandler)
+        public void Init(IPEndPoint _endPoint , Func<Session> _sessionFactory)
         {
             //문지기
-            listenSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            onAcceptHandler += _acceptHandler;
+            //서버 소켓 생성
+            listenSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); 
+            sessionFactory += _sessionFactory;
 
             //Bind
-            //소켓에 IP주소 와 포트번호 할당 (연결 , 묶음)
+            //매개변수로 들어온 IP와 포트정보를 소켓에 묶는다 (연결 , 묶음)
             listenSocket.Bind(_endPoint);
 
             //대기열 수 지정
@@ -34,9 +35,12 @@ namespace ServerCore
             //비동기 작업에 필요한 이벤트 핸들러
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-            //콜백
-            //접속승인이 될때 실행할 함수 등록
+            //콜백함수 등록
+            //접속승인이 되었다면 실행할 함수연결
             args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted); //입장시도가 생기면 호출할 콜백함수 등록
+
+            //멀티쓰레드 환경에서 서버 생성과 동시에 클라이언트에서 접속 승인 요청이 들어올수 있음 
+            //에러 방지를 위해 최초 함수호출 or 접속 승인을 비동기로 실행하기 위한 최초 함수호출
             RegisterAccept(args); //최초로 호출
         }
 
@@ -65,8 +69,16 @@ namespace ServerCore
             if (_args.SocketError == SocketError.Success)
             {
                 //접속승인 후 처리
-                //Init()함수를 호출할때 들어온 매개변수(함수)를 실행한다.
-                onAcceptHandler.Invoke(_args.AcceptSocket);
+
+                //session
+                //보내고 받는 역할 클래스
+                Session session = sessionFactory.Invoke();
+
+                //AcceptSocket 연결된 소켓
+                session.Init(_args.AcceptSocket);
+
+                //RemoteEndPoint
+                session.OnConnected(_args.AcceptSocket.RemoteEndPoint);
             }
             else
             {

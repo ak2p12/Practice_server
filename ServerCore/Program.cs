@@ -7,32 +7,38 @@ using System.Threading.Tasks;
 
 namespace ServerCore
 {
+    class GameSession : Session
+    {
+        public override void OnConnected(EndPoint _endPoint)
+        {
+            Console.WriteLine($"접속승인 : {_endPoint}");
+
+            byte[] sendBuff = Encoding.UTF8.GetBytes("환영합니다");
+            Send(sendBuff);
+            Thread.Sleep(1000);
+            Disconnect();
+        }
+
+        public override void OnDisconnected(EndPoint _endPoint)
+        {
+            Console.WriteLine($"접속종료 : {_endPoint}");
+        }
+
+        public override void OnRecv(ArraySegment<byte> buffer)
+        {
+            string recvData = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
+            Console.WriteLine($"Client : {recvData}");
+        }
+
+        public override void OnSend(int numOfBytes)
+        {
+            Console.WriteLine($"바이트 수 : {numOfBytes}");
+        }
+    }
     class Program
     {
-        static Listener listener = new Listener();
-        static void OnAcceptHandler(Socket _clientSocket)
-        {
-            try
-            {
-                //session
-                //보내고 받는 역할 클래스
-                Session session = new Session();
-                session.Init(_clientSocket);
-
-                //보낸다
-                byte[] sendBuff = Encoding.UTF8.GetBytes("환영합니다");
-                session.Send(sendBuff);
-                
-                Thread.Sleep(1000);
-
-                session.Disconnect();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            
-        }
+        static Listener listener = new Listener(); //서버 메인 (?)
+        
         static void Main(string[] args)
         {
             //DSN (Domain Name System)
@@ -47,12 +53,13 @@ namespace ServerCore
 
             //외부에서 최종적으로 접속할 IP 주소 생성
             //(호스트의 IP , 포트번호)
-            IPEndPoint endPoint = new IPEndPoint(ipAddr , 7777);
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-            listener.Init(endPoint , OnAcceptHandler);
+            //
+            listener.Init(endPoint, () => { return new GameSession(); } );
             Console.WriteLine("서버개방");
 
-            while (true)
+            while (true) 
             {
                     
             }
