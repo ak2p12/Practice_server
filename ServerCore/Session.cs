@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ServerCore
 {
-    abstract class Session
+    public abstract class Session
     {
         Socket socket;
         int disconnected = 0; //Disconnect 함수를 중복호출을 방지하기 위한 변수
@@ -35,6 +35,8 @@ namespace ServerCore
 
             RegisterRecv();
         }
+
+        #region 보낸다
         public void Send(byte[] _sendBuff)
         {
             //socket.Send(_sendBuff);
@@ -99,12 +101,16 @@ namespace ServerCore
             }
            
         }
+
+        #endregion
+
+        #region 받는다
         void RegisterRecv()
         {
             bool pending = socket.ReceiveAsync(recvArgs);
             if (pending == false)
             {
-                OnRecvCompleted(null , recvArgs);
+                OnRecvCompleted(null, recvArgs);
             }
         }
         void OnRecvCompleted(object _sender, SocketAsyncEventArgs _args)
@@ -121,9 +127,9 @@ namespace ServerCore
                     //접속승인한 클라소켓에서 정보를 받는다
                     //byte[] recbuff = new byte[1024]; //데이터를 받을 변수
 
-                    OnRecv(new ArraySegment<byte>(_args.Buffer, _args.Offset, _args.BytesTransferred) );
+                    OnRecv(new ArraySegment<byte>(_args.Buffer, _args.Offset, _args.BytesTransferred));
 
-                    
+
                     RegisterRecv();
                 }
                 catch (Exception e)
@@ -136,6 +142,8 @@ namespace ServerCore
                 Disconnect();
             }
         }
+        #endregion
+
         public void Disconnect()
         {
             if (Interlocked.Exchange(ref disconnected, 1) == 1)

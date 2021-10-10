@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServerCore;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -6,6 +7,38 @@ using System.Threading;
 
 namespace DummyClient
 {
+    class GameSession : Session
+    {
+        public override void OnConnected(EndPoint _endPoint)
+        {
+            Console.WriteLine($"접속승인 : {_endPoint}");
+
+            //서버에 보낼 데이터 생성
+            byte[] sendBuff = Encoding.UTF8.GetBytes($"안녕하세요 클라입니다.");
+
+            //RemoteEndPoint
+            //소켓에 연결되어 있는 IP와 포트 정보
+
+            //서버에 데이터 전송
+            Send(sendBuff);
+        }
+
+        public override void OnDisconnected(EndPoint _endPoint)
+        {
+            Console.WriteLine($"접속종료 : {_endPoint}");
+        }
+
+        public override void OnRecv(ArraySegment<byte> buffer)
+        {
+            string recvData = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
+            Console.WriteLine($"Server : {recvData}");
+        }
+
+        public override void OnSend(int numOfBytes)
+        {
+            Console.WriteLine($"바이트 수 : {numOfBytes}");
+        }
+    }
     class Program
     {
         static void Main(string[] args)
@@ -17,34 +50,28 @@ namespace DummyClient
             IPAddress ipAddr = ipHost.AddressList[0];
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-            while(true)
+            Connector connector = new Connector();
+            connector.Connect(endPoint , () => { return new GameSession();  });
+            while (true)
             {
-                Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //서버 생성
-
                 try
                 {
-                    //문지기에게 입장 문의
-                    socket.Connect(endPoint);
+                    ////문지기에게 입장 문의
+                    //socket.Connect(endPoint);
 
-                    //RemoteEndPoint
-                    //소켓에 연결되어 있는 IP와 포트 정보
-                    Console.WriteLine($"\n클라이언트의 정보 : {socket.RemoteEndPoint.ToString()}");
                     
-                    //서버에 보낼 데이터 생성
-                    byte[] sendBuff = Encoding.UTF8.GetBytes($"안녕하세요 클라입니다." );
-
-                    //서버에 데이터 전송
-                    int sendbytes = socket.Send(sendBuff);
+                    
+                    
                     
 
-                    //서버에서 보낸 데이터를 받기 위해 생성
-                    byte[] recvBuff = new byte[1024];
+                    ////서버에서 보낸 데이터를 받기 위해 생성
+                    //byte[] recvBuff = new byte[1024];
 
-                    //서버에서 보낸 데이터를 받는다.
-                    int recvbytes = socket.Receive(recvBuff);
+                    ////서버에서 보낸 데이터를 받는다.
+                    //int recvbytes = socket.Receive(recvBuff);
 
-                    string recvData = Encoding.UTF8.GetString(recvBuff, 0, recvbytes);
-                    Console.WriteLine($"서버에서 한말 : {recvData}");
+                    //string recvData = Encoding.UTF8.GetString(recvBuff, 0, recvbytes);
+                    //Console.WriteLine($"서버에서 한말 : {recvData}");
 
                     //소켓종료
                     //Shutdown
@@ -52,11 +79,11 @@ namespace DummyClient
                     //SocketShutdown.Receive (수신 차단)
                     //SocketShutdown.Send (송신 차단)
                     //SocketShutdown.Both (둘다 차단)
-                    socket.Shutdown(SocketShutdown.Both);
+                    //socket.Shutdown(SocketShutdown.Both);
 
                     //소켓종료
                     //송신과 수신 둘다 차단 후 종료한다.
-                    socket.Close();
+                    //socket.Close();
                 }
                 catch (Exception e)
                 {

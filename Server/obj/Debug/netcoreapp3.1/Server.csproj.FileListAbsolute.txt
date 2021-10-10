@@ -11,3 +11,6 @@ C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\obj\Debug\netcorea
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\obj\Debug\netcoreapp3.1\Server.dll
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\obj\Debug\netcoreapp3.1\Server.pdb
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\obj\Debug\netcoreapp3.1\Server.genruntimeconfig.cache
+C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\bin\Debug\netcoreapp3.1\ServerCore.dll
+C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\bin\Debug\netcoreapp3.1\ServerCore.pdb
+C:\Users\ak2p1\Desktop\Practice_server\Practice_server\Server\obj\Debug\netcoreapp3.1\Server.csproj.CopyComplete

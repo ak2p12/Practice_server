@@ -1,7 +1,4 @@
-C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.exe
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.deps.json
-C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.runtimeconfig.json
-C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.runtimeconfig.dev.json
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.dll
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.pdb
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.AssemblyInfoInputs.cache
@@ -9,5 +6,4 @@ C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netc
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csproj.CoreCompileInputs.cache
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.dll
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.pdb
-C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.genruntimeconfig.cache
 C:\Users\ak2p1\Desktop\Practice_server\Practice_server\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csprojAssemblyReference.cache

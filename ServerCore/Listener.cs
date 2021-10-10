@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ServerCore
 {
-    class Listener
+    public class Listener
     {
         //Socket
         //데이터를 통신 할 수 있도록 해주는 연결부
