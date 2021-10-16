@@ -7,38 +7,7 @@ using System.Threading;
 
 namespace DummyClient
 {
-    class GameSession : Session
-    {
-        public override void OnConnected(EndPoint _endPoint)
-        {
-            Console.WriteLine($"접속승인 : {_endPoint}");
-
-            //서버에 보낼 데이터 생성
-            byte[] sendBuff = Encoding.UTF8.GetBytes($"안녕하세요 클라입니다.");
-
-            //RemoteEndPoint
-            //소켓에 연결되어 있는 IP와 포트 정보
-
-            //서버에 데이터 전송
-            Send(sendBuff);
-        }
-
-        public override void OnDisconnected(EndPoint _endPoint)
-        {
-            Console.WriteLine($"접속종료 : {_endPoint}");
-        }
-
-        public override void OnRecv(ArraySegment<byte> buffer)
-        {
-            string recvData = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
-            Console.WriteLine($"Server : {recvData}");
-        }
-
-        public override void OnSend(int numOfBytes)
-        {
-            Console.WriteLine($"바이트 수 : {numOfBytes}");
-        }
-    }
+   
     class Program
     {
         static void Main(string[] args)
@@ -51,18 +20,13 @@ namespace DummyClient
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
             Connector connector = new Connector();
-            connector.Connect(endPoint , () => { return new GameSession();  });
+            connector.Connect(endPoint , () => { return new ServerSession();  });
             while (true)
             {
                 try
                 {
                     ////문지기에게 입장 문의
                     //socket.Connect(endPoint);
-
-                    
-                    
-                    
-                    
 
                     ////서버에서 보낸 데이터를 받기 위해 생성
                     //byte[] recvBuff = new byte[1024];

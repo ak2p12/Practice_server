@@ -8,34 +8,7 @@ using ServerCore;
 
 namespace Server
 {
-    class GameSession : Session
-    {
-        public override void OnConnected(EndPoint _endPoint)
-        {
-            Console.WriteLine($"접속승인 : {_endPoint}");
-
-            byte[] sendBuff = Encoding.UTF8.GetBytes("환영합니다");
-            Send(sendBuff);
-            Thread.Sleep(1000);
-            Disconnect();
-        }
-
-        public override void OnDisconnected(EndPoint _endPoint)
-        {
-            Console.WriteLine($"접속종료 : {_endPoint}");
-        }
-
-        public override void OnRecv(ArraySegment<byte> buffer)
-        {
-            string recvData = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
-            Console.WriteLine($"Client : {recvData}");
-        }
-
-        public override void OnSend(int numOfBytes)
-        {
-            Console.WriteLine($"바이트 수 : {numOfBytes}");
-        }
-    }
+   
     class Program
     {
         static Listener listener = new Listener(); //서버 메인 (?)
@@ -57,7 +30,7 @@ namespace Server
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
             //
-            listener.Init(endPoint, () => { return new GameSession(); });
+            listener.Init(endPoint, () => { return new ClientSession(); });
             Console.WriteLine("서버개방");
 
             while (true)
