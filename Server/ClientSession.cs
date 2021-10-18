@@ -26,46 +26,52 @@ namespace Server
     class PlayerInfoReq : Packet
     {
         public long playerID;
+        public string name;
 
         public PlayerInfoReq()
         {
             this.packetID = (ushort)PacketID.PlayerInfoReq;
         }
 
-        public override void Read(ArraySegment<byte> _arraySegment)
+        public override void Read(ArraySegment<byte> _arraySegment) 
         {
             ushort count = 0;
+
+            ReadOnlySpan<byte> s = new ReadOnlySpan<byte>(_arraySegment.Array, _arraySegment.Offset, _arraySegment.Count);
 
             //ushort size = BitConverter.ToUInt16(_arraySegment.Array, _arraySegment.Offset);
             count += 2;
             //ushort packetID = BitConverter.ToUInt16(_arraySegment.Array, _arraySegment.Offset + count);
             count += 2;
 
-            this.playerID = BitConverter.ToInt64(_arraySegment.Array, _arraySegment.Offset + count);
+            //this.playerID = BitConverter.ToInt64(_arraySegment.Array, _arraySegment.Offset + count);
+            this.playerID = BitConverter.ToInt64(s.Slice(count, s.Length - count));
             count += 8;
             //Console.WriteLine($"PlayerID : {playerID} ");
         }
 
-        public override ArraySegment<byte> Write()
+        public override ArraySegment<byte> Write() 
         {
-            ArraySegment<byte> s = SendBufferHelper.Open(4096);
+            ArraySegment<byte> segment = SendBufferHelper.Open(4096); //패킷크기를 임시적으로 4096 만큼 생성
+            Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
 
             ushort count = 0;
-            bool success = true;
+            bool success = true; //데이터 변환 성공 여부
 
+            //TryWriteBytes (추출한 데이터를 받을 배열 , 추출할 데이터)
 
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset + count, s.Count - count), this.packetID);
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset + count, s.Count - count), this.playerID);
-            count += 8;
+            count += sizeof(ushort);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.packetID);
+            count += sizeof(ushort);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.playerID);
+            count += sizeof(long);
 
-            success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset, s.Count), count);
+            success &= BitConverter.TryWriteBytes(s, count);
 
             if (success == false)
                 return null;
 
-            return SendBufferHelper.Close(count);
+            return SendBufferHelper.Close(count); //임시로 생성한 패킷을 실제로 사용한 크기로 다시 생성
         }
     }
 

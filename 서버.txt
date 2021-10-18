@@ -123,3 +123,18 @@ UDP
 
 바운더리란? : 부분적
 
+unicode & encoding (유니코드 , 인코딩)
+
+UTF-8 encoding
+영문 : 1바이트
+한글 : 3바이트
+
+UTF-16 encoding
+영문 : 2바이트
+한글 : 2바이트
+
+
+
+
+
+
