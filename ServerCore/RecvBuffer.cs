@@ -40,7 +40,7 @@ namespace ServerCore
             }
             else
             {
-                //인자 (위치를 옴길 하는 데이터 배열 , 옴길려고 하는 데이터 시작위치 , 옴길려고 하는 데이터배열을 받는 배열 , 받을 데이터배열 시작위치 , 크기);
+                //인자 (위치를 옴길 데이터 배열 , 옴길려고 하는 데이터 시작위치 , 옴길려고 하는 데이터배열을 받는 배열 , 받을 데이터배열 시작위치 , 크기);
                 Array.Copy(buffer.Array , buffer.Offset + readPos ,buffer.Array , buffer.Offset , dataSize);
                 readPos = 0;
                 writePos = dataSize;

@@ -70,7 +70,7 @@ namespace DummyClient
             ushort nameLen = (ushort)Encoding.Unicode.GetByteCount(this.name);
             success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), nameLen);
             count += sizeof(ushort);
-            Array.Copy(Encoding.Unicode.GetBytes(this.name) , 0 , segment.Array , count , nameLen);
+            Array.Copy( Encoding.Unicode.GetBytes(this.name) , 0 , segment.Array , count , nameLen);
 
             if (success == false)
                 return null;

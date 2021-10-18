@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\Practice_server\\ServerCore\\ServerCore.csproj",
+      "projectUniqueName": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\ServerCore\\ServerCore.csproj",
       "projectName": "ServerCore",
-      "projectPath": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\Practice_server\\ServerCore\\ServerCore.csproj",
+      "projectPath": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\ServerCore\\ServerCore.csproj",
       "packagesPath": "C:\\Users\\ak2p1\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\Practice_server\\ServerCore\\obj\\",
+      "outputPath": "C:\\Users\\ak2p1\\Desktop\\Practice_server\\ServerCore\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ak2p1\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -60,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.104\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.402\\RuntimeIdentifierGraph.json"
       }
     }
   }
