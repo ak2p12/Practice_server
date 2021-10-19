@@ -1,5 +1,6 @@
 ﻿using ServerCore;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -28,29 +29,78 @@ namespace Server
         public long playerID;
         public string name;
 
+        public struct SkillInfo
+        {
+            public int id;
+            public short level;
+            public float duration;
+
+            public bool Write(Span<byte> _s, ref ushort _count)
+            {
+                bool success = true;
+
+                success &= BitConverter.TryWriteBytes(_s.Slice(_count, _s.Length - _count), id);
+                _count += sizeof(int);
+
+                success &= BitConverter.TryWriteBytes(_s.Slice(_count, _s.Length - _count), level);
+                _count += sizeof(short);
+
+                success &= BitConverter.TryWriteBytes(_s.Slice(_count, _s.Length - _count), duration);
+                _count += sizeof(float);
+                return success;
+            }
+
+            public void Read(ReadOnlySpan<byte> _s, ref ushort _count)
+            {
+                id = BitConverter.ToInt32(_s.Slice(_count, _s.Length - _count));
+                _count += sizeof(int);
+
+                level = BitConverter.ToInt16(_s.Slice(_count, _s.Length - _count));
+                _count += sizeof(short);
+
+                duration = BitConverter.ToSingle(_s.Slice(_count, _s.Length - _count));
+                _count += sizeof(float);
+            }
+        }
+
+        public List<SkillInfo> skills = new List<SkillInfo>();
+
         public PlayerInfoReq()
         {
             this.packetID = (ushort)PacketID.PlayerInfoReq;
         }
 
-        public override void Read(ArraySegment<byte> _arraySegment) 
+        public override void Read(ArraySegment<byte> _arraySegment) //서버에서 받은 패킷을 역직렬화
         {
             ushort count = 0;
 
             ReadOnlySpan<byte> s = new ReadOnlySpan<byte>(_arraySegment.Array, _arraySegment.Offset, _arraySegment.Count);
-
-            //ushort size = BitConverter.ToUInt16(_arraySegment.Array, _arraySegment.Offset);
-            count += 2;
-            //ushort packetID = BitConverter.ToUInt16(_arraySegment.Array, _arraySegment.Offset + count);
-            count += 2;
-
-            //this.playerID = BitConverter.ToInt64(_arraySegment.Array, _arraySegment.Offset + count);
+            count += sizeof(ushort);
+            count += sizeof(ushort);
             this.playerID = BitConverter.ToInt64(s.Slice(count, s.Length - count));
-            count += 8;
-            //Console.WriteLine($"PlayerID : {playerID} ");
+            count += sizeof(long);
+
+            //string
+            ushort nameLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+            count += sizeof(ushort);
+            this.name = Encoding.Unicode.GetString(s.Slice(count, nameLen));
+            count += nameLen;
+
+            //Skill List
+            skills.Clear(); //리스트 안에 다른 데이터가 들어가 있을 경우
+            ushort skillLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+            count += sizeof(ushort);
+
+            for (int i = 0; i < skillLen; ++i)
+            {
+                SkillInfo skill = new SkillInfo();
+                skill.Read(s, ref count);
+                skills.Add(skill);
+
+            }
         }
 
-        public override ArraySegment<byte> Write() 
+        public override ArraySegment<byte> Write() //서버에 보낼 데이터를 직렬화
         {
             ArraySegment<byte> segment = SendBufferHelper.Open(4096); //패킷크기를 임시적으로 4096 만큼 생성
             Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
@@ -66,7 +116,22 @@ namespace Server
             success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.playerID);
             count += sizeof(long);
 
-            success &= BitConverter.TryWriteBytes(s, count);
+            //string
+            ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length, segment.Array, segment.Offset + count + sizeof(ushort));
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), nameLen); //string 의 크기를 넣어준다
+            count += sizeof(ushort);
+            count += nameLen;
+
+            //Skill List
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)skills.Count); //Skill List의 크기를 넣어준다
+            count += sizeof(ushort);
+
+            foreach (SkillInfo skill in skills)
+            {
+                success &= skill.Write(s, ref count);
+            }
+
+            success &= BitConverter.TryWriteBytes(s, count); //최종 패킷 크기
 
             if (success == false)
                 return null;
@@ -116,7 +181,11 @@ namespace Server
                     {
                         PlayerInfoReq p = new PlayerInfoReq();
                         p.Read(_buffer);
-                        Console.WriteLine($"PlayerID : {p.playerID} ");
+                        Console.WriteLine($"이름 : {p.name} \nPlayerID : {p.playerID} ");
+                        foreach (PlayerInfoReq.SkillInfo skill in p.skills)
+                        {
+                            Console.WriteLine($"skill ({skill.id})({skill.level})({skill.duration})");
+                        }
                     }
                     break;
 

@@ -63,3 +63,5 @@ Server/bin
 Server/obj
 ServerCore/bin
 ServerCore/obj
+PacketGenerator/obj
+PacketGenerator/bin
