@@ -59,11 +59,7 @@ namespace Server
                     {
                         PlayerInfoReq p = new PlayerInfoReq();
                         p.Read(_buffer);
-                        Console.WriteLine($"이름 : {p.name} \nPlayerID : {p.playerID} ");
-                        foreach (PlayerInfoReq.Skill skill in p.skills)
-                        {
-                            Console.WriteLine($"skill ({skill.id})({skill.level})({skill.duration})");
-                        }
+                        
                     }
                     break;
             }
