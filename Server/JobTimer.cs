@@ -8,7 +8,7 @@ namespace Server
     struct JobTimerElem : IComparable<JobTimerElem>
     {
         public int execTick; //실행 시간
-        public Action action;
+        public Action action; //시간이 되면 실행할 함수
         public int CompareTo(JobTimerElem other)
         {
             return other.execTick - execTick; //상대방 틱에서 내틱을 뻰다

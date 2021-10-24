@@ -21,7 +21,7 @@ namespace DummyClient
             Connector connector = new Connector();
 
             //500 클라수
-            connector.Connect(endPoint , () => { return SessionManager.Instance.Generate();  } , 500); 
+            connector.Connect(endPoint , () => { return SessionManager.Instance.Generate();  } , 1); 
             while (true)
             {
                 try

@@ -17,7 +17,7 @@ namespace Server
         static void FlushRoom()
         {
             Room.Push(() => Room.Flush());
-            JobTimer.Instance.Push(FlushRoom, 250);
+            JobTimer.Instance.Push(FlushRoom, 1000);
         }
 
         static void Main(string[] args)

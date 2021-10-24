@@ -25,7 +25,7 @@ namespace Server
         public override void OnConnected(EndPoint _endPoint)
         {
             Program.Room.Push( () => Program.Room.Enter(this));
-            Console.WriteLine($"Server : 접속승인 : {_endPoint}");
+            Console.WriteLine($"Server에서 한말 : 접속승인됨 {_endPoint}");
         }
 
         public override void OnRecvPacket(ArraySegment<byte> _buffer)

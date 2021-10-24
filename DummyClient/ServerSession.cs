@@ -28,6 +28,7 @@ namespace DummyClient
 
         public override void OnSend(int numOfBytes)
         {
+            //Console.WriteLine($"클라에서 서버로 {numOfBytes} 이만큼 보내기 성공");
             //Console.WriteLine($"바이트 수 : {numOfBytes}");
         }
     }

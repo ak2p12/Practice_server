@@ -13,7 +13,7 @@ namespace ServerCore
         {
             for (int i = 0; i < count; ++i)
             {
-                Socket socket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //서버 생성.
+                Socket socket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //클라 소켓 생성.
 
                 sessionFactory = _sessionFactory;
 

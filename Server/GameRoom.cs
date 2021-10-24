@@ -22,7 +22,7 @@ namespace Server
             {
                  s.Send(pendingList);
             }
-            Console.WriteLine($"서버에 넘기는 pendingList의 개수 : {pendingList.Count}");
+            Console.WriteLine($"서버에서 클라소켓에 넘기는 pendingList의 개수 : {pendingList.Count}");
             pendingList.Clear();
         }
 
