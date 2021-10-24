@@ -12,9 +12,17 @@ namespace Server
     class Program
     {
         static Listener listener = new Listener(); //서버 메인 (?)
+        public static GameRoom Room = new GameRoom();
+
+        static void FlushRoom()
+        {
+            Room.Push(() => Room.Flush());
+            JobTimer.Instance.Push(FlushRoom, 250);
+        }
 
         static void Main(string[] args)
         {
+
             //DSN (Domain Name System)
             string host = Dns.GetHostName(); //로컬pc의 호스트 이름을 얻는다
             IPHostEntry ipHost = Dns.GetHostEntry(host); //호스트이름으로 IP 정보를 얻는다.
@@ -30,12 +38,14 @@ namespace Server
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
             //
-            listener.Init(endPoint, () => { return new ClientSession(); });
+            listener.Init(endPoint, () => { return SessionManager.Instance.Generate();  });
             Console.WriteLine("서버개방");
+
+            FlushRoom();
 
             while (true)
             {
-
+                JobTimer.Instance.Flush();
             }
 
 

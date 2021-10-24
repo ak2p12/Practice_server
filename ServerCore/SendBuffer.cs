@@ -9,7 +9,7 @@ namespace ServerCore
     public class SendBufferHelper //나만 사용하는 스레드
     {
         public static ThreadLocal<SendBuffer> CurrentBuffer = new ThreadLocal<SendBuffer>( ()=> { return null; } );
-        public static int ChunkSize { get; set; } = 4096 * 100;
+        public static int ChunkSize { get; set; } = 65535 * 100;
 
         public static ArraySegment<byte> Open(int _reserveSize)  //사용할 데이터 크기
         {

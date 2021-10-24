@@ -16,7 +16,7 @@ namespace ServerCore
         Socket listenSocket; //서버의 소켓
         Func<Session> sessionFactory; //서버 컨텐츠(서버기능) 생성기
 
-        public void Init(IPEndPoint _endPoint , Func<Session> _sessionFactory)
+        public void Init(IPEndPoint _endPoint , Func<Session> _sessionFactory , int register = 10 , int backlog = 100)
         {
             //문지기
             //서버 소켓 생성
@@ -29,19 +29,22 @@ namespace ServerCore
 
             //대기열 수 지정
             //대기열 수를 초과한다면 접속요청을 하자마자 거부당함
-            listenSocket.Listen(10); //최대 대기수
+            listenSocket.Listen(backlog); //최대 대기수
 
-            //SocketAsyncEventArgs
-            //비동기 작업에 필요한 이벤트 핸들러
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+            for (int i = 0; i < register; ++i)
+            {
+                //SocketAsyncEventArgs
+                //비동기 작업에 필요한 이벤트 핸들러
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-            //콜백함수 등록
-            //접속승인이 되었다면 실행할 함수연결
-            args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted); //입장시도가 생기면 호출할 콜백함수 등록
+                //콜백함수 등록
+                //접속승인이 되었다면 실행할 함수연결
+                args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted); //입장시도가 생기면 호출할 콜백함수 등록
 
-            //멀티쓰레드 환경에서 서버 생성과 동시에 클라이언트에서 접속 승인 요청이 들어올수 있음 
-            //에러 방지를 위해 최초 함수호출 or 접속 승인을 비동기로 실행하기 위한 최초 함수호출
-            RegisterAccept(args); //최초로 호출
+                //멀티쓰레드 환경에서 서버 생성과 동시에 클라이언트에서 접속 승인 요청이 들어올수 있음 
+                //에러 방지를 위해 최초 함수호출 or 접속 승인을 비동기로 실행하기 위한 최초 함수호출
+                RegisterAccept(args); //최초로 호출
+            }
         }
 
         void RegisterAccept(SocketAsyncEventArgs _args)

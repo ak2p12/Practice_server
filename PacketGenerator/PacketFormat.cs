@@ -6,6 +6,65 @@ namespace PacketGenerator
 {
     class PacketFormat
     {
+        //{0} 패킷등록
+        public static string managerFormat =
+ @"using ServerCore;
+using System;
+using System.Collections.Generic;
+
+class PacketManager
+{{
+    #region Singleton
+    static PacketManager instance = new PacketManager();
+    public static PacketManager Instance{{ get {{ return instance; }} }}
+    #endregion
+
+    PacketManager()
+    {{
+        Register();
+    }}
+
+    Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> onRecv = new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>>();
+    Dictionary<ushort, Action<PacketSession, IPacket>> handler = new Dictionary<ushort, Action<PacketSession, IPacket>>();
+
+    public void Register()
+    {{
+        {0}
+    }}
+
+    public void OnRecvPacket(PacketSession session , ArraySegment<byte> buffer)
+    {{
+        ushort count = 0;
+
+        ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
+        count += 2;
+        ushort packetID = BitConverter.ToUInt16(buffer.Array, buffer.Offset + count);
+        count += 2;
+
+        Action<PacketSession, ArraySegment<byte>> action = null;
+        if (onRecv.TryGetValue(packetID , out action))
+        {{
+            action.Invoke(session, buffer);
+        }}
+    }}
+
+    void MakePacket<T>(PacketSession session , ArraySegment<byte> buffer) where T : IPacket , new()
+    {{
+        T pkt = new T();
+        pkt.Read(buffer);
+        Action<PacketSession, IPacket> action = null;
+        if( handler.TryGetValue(pkt.Protocol , out action) )
+        {{
+            action.Invoke(session, pkt) ;
+        }}
+    }}
+}}";
+        //{0} 패킷 이름
+        public static string managerRigisgerFormat =
+@"
+        onRecv.Add((ushort)PacketID.{0} , MakePacket<{0}>);
+        handler.Add((ushort)PacketID.{0} , PacketHandler.{0}Handler);";
+
         // {0} 패킷 이름/번호 목록
         // {1} 패킷 목록
         public static string fileFormat =

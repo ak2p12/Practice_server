@@ -9,6 +9,9 @@ namespace PacketGenerator
         static string genPackets;
         static ushort packetId;
         static string packetEnums;
+
+        static string clientRigister;
+        static string serverRigister;
         
         static void Main(string[] args)
         {
@@ -37,6 +40,12 @@ namespace PacketGenerator
 
                 string fileText = string.Format(PacketFormat.fileFormat , packetEnums, genPackets);
                 File.WriteAllText("GenPackets.cs", fileText); //파일로 저장 및 생성
+
+                string clientManagerText = string.Format(PacketFormat.managerFormat , clientRigister);
+                File.WriteAllText("ClientPacketManager.cs", clientManagerText); //파일로 저장 및 생성
+
+                string serverManagerText = string.Format(PacketFormat.managerFormat, serverRigister);
+                File.WriteAllText("ServerPacketManager.cs", serverManagerText); //파일로 저장 및 생성
             }
         }
 
@@ -61,8 +70,17 @@ namespace PacketGenerator
 
             Tuple<string,string,string> t = ParseMemvers(_r);
             genPackets += string.Format(PacketFormat.packetFormat,packetName, t.Item1, t.Item2, t.Item3);
-
             packetEnums += string.Format(PacketFormat.packetEnumFormat , packetName , ++packetId) + Environment.NewLine + "\t";
+
+            if (packetName.StartsWith("S_") || packetName.StartsWith("_s"))
+            {
+                clientRigister += string.Format(PacketFormat.managerRigisgerFormat, packetName) + Environment.NewLine;
+            }
+            else
+            {
+                serverRigister += string.Format(PacketFormat.managerRigisgerFormat, packetName) + Environment.NewLine;
+            }
+                
         }
 
         public static Tuple<string,string,string> ParseMemvers(XmlReader _r)

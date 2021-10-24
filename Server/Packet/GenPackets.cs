@@ -6,8 +6,8 @@ using System.Text;
 
 public enum PacketID
 {
-    PlayerInfoReq = 1,
-	Test = 2,
+    C_Chat = 1,
+	S_Chat = 2,
 	
 }
 
@@ -19,91 +19,11 @@ interface IPacket
 }
 
 
-class PlayerInfoReq : IPacket
+class C_Chat : IPacket
 {
-    public byte testByte;
-	public long playerID;
-	public string name;
-	public class Skill
-	{
-	    public int id;
-		public short level;
-		public float duration;
-		public class Attribute
-		{
-		    public int att;
-		
-		    public void Read(ReadOnlySpan<byte> s, ref ushort count)
-		    {
-		        this.att = BitConverter.ToInt32(s.Slice(count, s.Length - count));
-				count += sizeof(int);
-				
-		    }
-		
-		    public bool Write(Span<byte> s, ref ushort count)
-		    {
-		        bool success = true;
-		
-		        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.att);
-				count += sizeof(int);
-				
-		
-		        return success;
-		    }
-		}
-		
-		public List<Attribute> attributes = new List<Attribute>();
-	
-	    public void Read(ReadOnlySpan<byte> s, ref ushort count)
-	    {
-	        this.id = BitConverter.ToInt32(s.Slice(count, s.Length - count));
-			count += sizeof(int);
-			
-			this.level = BitConverter.ToInt16(s.Slice(count, s.Length - count));
-			count += sizeof(short);
-			
-			this.duration = BitConverter.ToSingle(s.Slice(count, s.Length - count));
-			count += sizeof(float);
-			
-			attributes.Clear(); //리스트 안에 다른 데이터가 들어가 있을 경우
-			ushort attributeLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
-			count += sizeof(ushort);
-			
-			for (int i = 0; i < attributeLen; ++i)
-			{
-			    Attribute attribute = new Attribute();
-			    attribute.Read(s , ref count);
-			    attributes.Add(attribute );
-			}
-	    }
-	
-	    public bool Write(Span<byte> s, ref ushort count)
-	    {
-	        bool success = true;
-	
-	        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.id);
-			count += sizeof(int);
-			
-			success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.level);
-			count += sizeof(short);
-			
-			success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.duration);
-			count += sizeof(float);
-			
-			success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)this.attributes.Count); //Skill List의 크기를 넣어준다
-			count += sizeof(ushort);
-			
-			foreach(Attribute attribute in this.attributes)
-			    success &= attribute.Write(s , ref count);
-			
-	
-	        return success;
-	    }
-	}
-	
-	public List<Skill> skills = new List<Skill>();
+    public string chat;
 
-    public ushort Protocol { get { return (ushort)PacketID.PlayerInfoReq; } }
+    public ushort Protocol { get { return (ushort)PacketID.C_Chat; } }
 
     public void Read(ArraySegment<byte> segment) //서버에서 받은 패킷을 역직렬화
     {
@@ -113,27 +33,11 @@ class PlayerInfoReq : IPacket
         count += sizeof(ushort);
         count += sizeof(ushort);
 
-        this.testByte = (byte)segment.Array[segment.Offset + count];
-		count += sizeof(byte);
-		
-		this.playerID = BitConverter.ToInt64(s.Slice(count, s.Length - count));
-		count += sizeof(long);
-		
-		ushort nameLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+        ushort chatLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
 		count += sizeof(ushort);
-		this.name = Encoding.Unicode.GetString(s.Slice(count, nameLen));
-		count += nameLen;
+		this.chat = Encoding.Unicode.GetString(s.Slice(count, chatLen));
+		count += chatLen;
 		
-		skills.Clear(); //리스트 안에 다른 데이터가 들어가 있을 경우
-		ushort skillLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
-		count += sizeof(ushort);
-		
-		for (int i = 0; i < skillLen; ++i)
-		{
-		    Skill skill = new Skill();
-		    skill.Read(s , ref count);
-		    skills.Add(skill );
-		}
     }
 
     public ArraySegment<byte> Write() //서버에 보낼 데이터를 직렬화
@@ -147,25 +51,13 @@ class PlayerInfoReq : IPacket
         //TryWriteBytes (추출한 데이터를 받을 배열 , 추출할 데이터)
             
         count += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.PlayerInfoReq);
+        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.C_Chat);
         count += sizeof(ushort);
 
-        segment.Array[segment.Offset + count] = (byte)this.testByte;
-		count += sizeof(byte);
-		
-		success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.playerID);
-		count += sizeof(long);
-		
-		ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length , segment.Array, segment.Offset + count + sizeof(ushort));
-		success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), nameLen); //string 의 크기를 넣어준다
+        ushort chatLen = (ushort)Encoding.Unicode.GetBytes(this.chat, 0, this.chat.Length , segment.Array, segment.Offset + count + sizeof(ushort));
+		success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), chatLen); //string 의 크기를 넣어준다
 		count += sizeof(ushort);
-		count += nameLen;
-		
-		success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)this.skills.Count); //Skill List의 크기를 넣어준다
-		count += sizeof(ushort);
-		
-		foreach(Skill skill in this.skills)
-		    success &= skill.Write(s , ref count);
+		count += chatLen;
 		
 
         success &= BitConverter.TryWriteBytes(s, count); //최종 패킷 크기
@@ -177,11 +69,12 @@ class PlayerInfoReq : IPacket
     }
 }
 
-class Test : IPacket
+class S_Chat : IPacket
 {
-    public int TestInt;
+    public int playerId;
+	public string chat;
 
-    public ushort Protocol { get { return (ushort)PacketID.Test; } }
+    public ushort Protocol { get { return (ushort)PacketID.S_Chat; } }
 
     public void Read(ArraySegment<byte> segment) //서버에서 받은 패킷을 역직렬화
     {
@@ -191,8 +84,13 @@ class Test : IPacket
         count += sizeof(ushort);
         count += sizeof(ushort);
 
-        this.TestInt = BitConverter.ToInt32(s.Slice(count, s.Length - count));
+        this.playerId = BitConverter.ToInt32(s.Slice(count, s.Length - count));
 		count += sizeof(int);
+		
+		ushort chatLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+		count += sizeof(ushort);
+		this.chat = Encoding.Unicode.GetString(s.Slice(count, chatLen));
+		count += chatLen;
 		
     }
 
@@ -207,11 +105,16 @@ class Test : IPacket
         //TryWriteBytes (추출한 데이터를 받을 배열 , 추출할 데이터)
             
         count += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.Test);
+        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.S_Chat);
         count += sizeof(ushort);
 
-        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.TestInt);
+        success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.playerId);
 		count += sizeof(int);
+		
+		ushort chatLen = (ushort)Encoding.Unicode.GetBytes(this.chat, 0, this.chat.Length , segment.Array, segment.Offset + count + sizeof(ushort));
+		success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), chatLen); //string 의 크기를 넣어준다
+		count += sizeof(ushort);
+		count += chatLen;
 		
 
         success &= BitConverter.TryWriteBytes(s, count); //최종 패킷 크기

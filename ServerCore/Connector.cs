@@ -9,19 +9,22 @@ namespace ServerCore
     public class Connector
     {
         Func<Session> sessionFactory;
-        public void Connect(IPEndPoint _endPoint , Func<Session> _sessionFactory)
+        public void Connect(IPEndPoint _endPoint , Func<Session> _sessionFactory , int count = 1)
         {
+            for (int i = 0; i < count; ++i)
+            {
+                Socket socket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //서버 생성.
+
+                sessionFactory = _sessionFactory;
+
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.Completed += OnConnectCompleted;
+                args.RemoteEndPoint = _endPoint;
+                args.UserToken = socket;
+
+                RigesterConnect(args);
+            }
             
-            Socket socket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //서버 생성.
-
-            sessionFactory = _sessionFactory;
-
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += OnConnectCompleted;
-            args.RemoteEndPoint = _endPoint;
-            args.UserToken = socket;
-
-            RigesterConnect(args);
         }
 
         void RigesterConnect(SocketAsyncEventArgs _args)
