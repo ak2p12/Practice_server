@@ -50,9 +50,9 @@ namespace ServerCore
         public abstract void OnRecvPacket(ArraySegment<byte> _buffer);
     }
 
-    public abstract class Session
+    public abstract class Session //보내고 받는 역할
     {
-        Socket socket;
+        Socket socket; //대상의 소켓
         int disconnected = 0; //Disconnect 함수를 중복호출을 방지하기 위한 변수
 
         RecvBuffer recvBuffer = new RecvBuffer(65535);
@@ -63,10 +63,10 @@ namespace ServerCore
         List<ArraySegment<byte>> pendingList = new List<ArraySegment<byte>>();
         object myLock = new object();
 
-        public abstract void OnConnected(EndPoint _endPoint);
-        public abstract int OnRecv(ArraySegment<byte> _buffer);
-        public abstract void OnSend(int _numOfBytes);
-        public abstract void OnDisconnected(EndPoint _endPoint);
+        public abstract void OnConnected(EndPoint _endPoint); //서버 또는 클라이언트에서 연결이 된 경우 호출 될 함수
+        public abstract int OnRecv(ArraySegment<byte> _buffer); //성공적으로 데이터를 받았다면 호출 될 함수
+        public abstract void OnSend(int _numOfBytes); //성공적으로 데이터를 보냈을때 호출 될 함수
+        public abstract void OnDisconnected(EndPoint _endPoint); //연결이 끊어졌을때 호출 될 함수
 
         void Clear()
         {

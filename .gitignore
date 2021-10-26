@@ -65,3 +65,6 @@ ServerCore/bin
 ServerCore/obj
 PacketGenerator/obj
 PacketGenerator/bin
+Client/obj
+Client/Logs
+Client/Library

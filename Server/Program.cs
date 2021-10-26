@@ -11,7 +11,8 @@ namespace Server
    
     class Program
     {
-        static Listener listener = new Listener(); //서버 메인 (?)
+        static Listener listener = new Listener(); //서버의 소켓 클라이언트가 접속 요청을 할 경우 여기에서 처리한다
+
         public static GameRoom Room = new GameRoom();
 
         static void FlushRoom()

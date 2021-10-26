@@ -6,22 +6,25 @@ namespace DummyClient
 {
     class SessionManager
     {
+        #region Singleton
         static SessionManager session = new SessionManager();
         public static SessionManager Instance { get { return session; } }
+        #endregion
 
         List<ServerSession> sessions = new List<ServerSession>();
         object mylock = new object();
-
+        Random random = new Random();
         public void SendForEach()
         {
             lock(mylock)
             {
                 foreach(ServerSession s in sessions)
                 {
-                    C_Chat chatPacket = new C_Chat();
-                    chatPacket.chat = "안녕하세요 서버님";
-                    ArraySegment<byte> segment = chatPacket.Write();
-                    s.Send(segment);
+                    C_Move movePacket = new C_Move();
+                    movePacket.posX = random.Next(-50,50);
+                    movePacket.posY = 0;
+                    movePacket.posZ = random.Next(-50, 50);
+                    s.Send(movePacket.Write());
                 }
             }
         }

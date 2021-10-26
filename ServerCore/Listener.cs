@@ -38,7 +38,7 @@ namespace ServerCore
                 SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
                 //콜백함수 등록
-                //접속승인이 되었다면 실행할 함수연결
+                //접속승인이 되었다면 실행 할 함수연결
                 args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted); //입장시도가 생기면 호출할 콜백함수 등록
 
                 //멀티쓰레드 환경에서 서버 생성과 동시에 클라이언트에서 접속 승인 요청이 들어올수 있음 

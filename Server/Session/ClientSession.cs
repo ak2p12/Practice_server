@@ -22,6 +22,11 @@ namespace Server
     {
         public int SessionId { get; set; }
         public GameRoom Room { get; set; }
+
+        public float PosX { get; set; }
+        public float PosY { get; set; }
+        public float PosZ { get; set; }
+
         public override void OnConnected(EndPoint _endPoint)
         {
             Program.Room.Push( () => Program.Room.Enter(this));
@@ -30,7 +35,7 @@ namespace Server
 
         public override void OnRecvPacket(ArraySegment<byte> _buffer)
         {
-            PacketManager.Instance.OnRecvPacket(this, _buffer);
+            PacketManager.Instance.OnRecvPacket(this, _buffer); //클라이언트에서 받은 패킷을 저리한다.
         }
 
         public override void OnDisconnected(EndPoint _endPoint)

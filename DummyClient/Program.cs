@@ -11,7 +11,6 @@ namespace DummyClient
     {
         static void Main(string[] args)
         {
-
             //DSN (Domain Name System)
             string host = Dns.GetHostName(); //로컬pc의 호스트 이름을 얻는다 (서버pc)
             IPHostEntry ipHost = Dns.GetHostEntry(host); //호스트 정보를 얻는다.
